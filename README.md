@@ -110,6 +110,8 @@ This downloads and installs the backend admin boilerplate package into your Lara
 ```
 php artisan vendor:publish --tag=boilerplate
 
+php artisan vendor:publish --tag=boilerplate-views
+
 ```
 
 This will copy the boilerplate’s config files to config/boilerplate, language files, public assets (CSS/JS), views, and routes into your Laravel application so you can customize them.
