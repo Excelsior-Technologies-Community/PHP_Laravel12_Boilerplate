@@ -1,59 +1,279 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# PHP_Laravel12_Boilerplate
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+---
 
-## About Laravel
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Project Description
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+PHP_Laravel12_Boilerplate is a Laravel 12 based admin boilerplate project built using the sebastienheyd/boilerplate package.
+This project provides a ready-made admin panel with authentication, user management, role & permission system, and AdminLTE 3 UI.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+The main goal of this project is to save development time by using a pre-built backend structure instead of creating everything from scratch.
 
-## Learning Laravel
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## This boilerplate is suitable for:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Admin panels
 
-## Laravel Sponsors
+CMS systems
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+ERP / CRM backends
 
-### Premium Partners
+Role-based applications
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
 
-## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Key Features:
 
-## Code of Conduct
+Laravel 12 framework
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+AdminLTE 3 dashboard UI
 
-## Security Vulnerabilities
+User Registration & Login
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Role & Permission Management
 
-## License
+User CRUD (Create, Read, Update, Delete)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Profile Management
+
+Secure Authentication
+
+Sidebar Menu System
+
+Blade Template Engine
+
+MySQL Database Support
+
+
+## Technologies Used
+
+PHP 8+
+
+Laravel 12
+
+MySQL
+
+Blade Template Engine
+
+AdminLTE 3
+
+
+
+
+---
+
+
+
+# Project SetUp
+
+---
+
+## STEP 1: Create Laravel 12 Project
+
+### Command:
+
+```
+composer create-project laravel/laravel PHP_Laravel12_Boilerplate "12.*"
+
+```
+
+### Go inside project:
+
+```
+cd PHP_Laravel12_Boilerplate
+
+```
+
+This will create a fresh Laravel project in a folder called PHP_Laravel12_Boilerplate.
+
+
+
+## Step 2 — Install the Boilerplate Package
+
+### Install the AdminLTE 3 Boilerplate package via composer:
+
+```
+composer require sebastienheyd/boilerplate
+
+```
+
+This downloads and installs the backend admin boilerplate package into your Laravel app.
+
+
+
+
+## Step 3 — Publish Boilerplate Files
+
+### Publish assets, configuration files, views and other essentials:
+
+```
+php artisan vendor:publish --tag=boilerplate
+
+```
+
+This will copy the boilerplate’s config files to config/boilerplate, language files, public assets (CSS/JS), views, and routes into your Laravel application so you can customize them.
+
+
+
+## Step 4 — Configure Database
+
+### Open your .env file and update your database configuration:
+
+```
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=laravel12_boilerplate
+DB_USERNAME=root
+DB_PASSWORD=
+
+```
+
+### Create database:
+
+```
+laravel12_boilerplate
+
+```
+
+
+## Step 5 — Run the Migrations
+
+### Now apply the database schema:
+
+```
+php artisan migrate
+
+```
+
+This will create all required tables for users, roles, permissions, logs, etc.
+
+
+
+
+## Step 6 — Serve Your App
+
+### Run the built-in Laravel server to launch the project:
+
+```
+php artisan serve
+
+```
+
+### Then open in the browser:
+
+```
+http://localhost:8000/admin
+
+```
+
+## So you can see this type Output:
+
+### Register Page:
+
+
+<img width="1912" height="918" alt="Screenshot 2026-01-09 102236" src="https://github.com/user-attachments/assets/e6ce4897-9767-429f-a7e6-391827710d39" />
+
+
+### Login Page:
+
+
+<img width="1917" height="942" alt="Screenshot 2026-01-09 102708" src="https://github.com/user-attachments/assets/3a07f6c9-2450-43a1-89c0-7be2ce242cc3" />
+
+
+### Admin Page(after register/login):
+
+
+<img width="1914" height="952" alt="Screenshot 2026-01-09 102430" src="https://github.com/user-attachments/assets/4a21ddfa-538b-4103-8f04-04d0ddd6425e" />
+
+
+### User Profile Page:
+
+
+<img width="1919" height="951" alt="Screenshot 2026-01-09 102512" src="https://github.com/user-attachments/assets/0c244346-f25e-4788-b34b-475945009966" />
+
+
+### User Create Page:
+
+
+<img width="1919" height="950" alt="Screenshot 2026-01-09 102521" src="https://github.com/user-attachments/assets/5558962f-3e92-41e5-a755-bd6d0fa1bbe0" />
+
+
+### User Page(List):
+
+
+<img width="1912" height="947" alt="Screenshot 2026-01-09 102534" src="https://github.com/user-attachments/assets/4317d4c0-081b-412e-b103-3ce18f1bf0a8" />
+
+
+### Role Page(User RolesList):
+
+
+<img width="1919" height="943" alt="Screenshot 2026-01-09 102549" src="https://github.com/user-attachments/assets/6422299b-f6f2-43d7-ba24-5473d8c9fde0" />
+
+
+### Logs Page(logs information):
+
+
+<img width="1915" height="948" alt="Screenshot 2026-01-09 110919" src="https://github.com/user-attachments/assets/792e286f-5653-471b-9f13-dc00ae8abc11" />
+
+
+### Logout Page:
+
+
+<img width="1917" height="931" alt="Screenshot 2026-01-09 102629" src="https://github.com/user-attachments/assets/4c78bd96-8809-481c-8e56-8d53b305d936" />
+
+
+
+
+---
+
+
+
+# Project Folder Structure:
+
+```
+PHP_Laravel12_Boilerplate/
+│
+├── app/
+│   ├── Http/
+│   │   ├── Controllers/        # Application controllers
+│   │   └── Middleware/         # Auth & role middleware
+│   │
+│   ├── Models/                 # Eloquent models (User, Role, etc.)
+│   └── Providers/
+│
+├── config/
+│   ├── boilerplate/            # Boilerplate configuration files
+│   └── app.php
+│
+├── database/
+│   ├── migrations/             # Database tables (users, roles, permissions)
+│   └── seeders/
+│
+├── public/
+│   └── assets/
+│       └── vendor/boilerplate/ # AdminLTE CSS & JS files
+│
+├── resources/
+│   ├── views/
+│   │   └── vendor/
+│   │       └── boilerplate/    # Blade views (login, dashboard, users, roles)
+│   │
+│   └── lang/
+│       └── vendor/boilerplate/ # Language files
+│
+├── routes/
+│   ├── web.php                 # Default Laravel routes
+│   ├── boilerplate.php         # Admin panel routes
+│   └── api.php
+│
+├── storage/
+│
+├── .env                        # Environment configuration
+├── composer.json
+├── artisan
+└── README.md
+
+```
+
