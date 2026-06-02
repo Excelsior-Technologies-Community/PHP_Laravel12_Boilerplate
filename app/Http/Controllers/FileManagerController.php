@@ -3,21 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\FileManager;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class FileManagerController extends Controller
 {
     public function index()
     {
-        $files = FileManager::query()
-            ->with('uploader')
-            ->latest()
+        $files = FileManager::with('user')
+            ->orderBy('created_at', 'desc')
             ->paginate(15);
-
+        
         return view('boilerplate::file-manager.index', compact('files'));
     }
 
@@ -26,65 +23,103 @@ class FileManagerController extends Controller
         return view('boilerplate::file-manager.create');
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
-        $validated = $request->validate([
-            'file' => [
-                'required',
-                'file',
-                'max:51200',
-            ],
+        $request->validate([
+            'file' => 'required|file|max:102400', // Max 100MB
+            'description' => 'nullable|string|max:500'
         ]);
 
-        $uploadedFile = $validated['file'];
-        $disk = 'public';
-        $directory = 'file-manager/'.now()->format('Y/m');
-        $fileName = (string) Str::uuid();
-        $path = $uploadedFile->storeAs($directory, $fileName, $disk);
-
-        FileManager::create([
-            'original_name' => $uploadedFile->getClientOriginalName(),
-            'file_name' => $fileName,
-            'path' => $path,
-            'disk' => $disk,
-            'mime_type' => $uploadedFile->getMimeType(),
-            'size' => $uploadedFile->getSize(),
-            'uploaded_by' => $request->user()?->id,
+        $uploadedFile = $request->file('file');
+        $originalName = $uploadedFile->getClientOriginalName();
+        $fileSize = $uploadedFile->getSize();
+        $mimeType = $uploadedFile->getMimeType();
+        $fileType = $this->getFileCategory($mimeType);
+        
+        // Generate unique filename
+        $filename = Str::uuid() . '_' . time() . '_' . Str::slug(pathinfo($originalName, PATHINFO_FILENAME)) . '.' . $uploadedFile->getClientOriginalExtension();
+        
+        // Store file
+        $path = $uploadedFile->storeAs('uploads/files', $filename, 'public');
+        
+        // Create database record
+        $file = FileManager::create([
+            'name' => $filename,
+            'original_name' => $originalName,
+            'file_path' => $path,
+            'file_size' => $fileSize,
+            'file_type' => $fileType,
+            'mime_type' => $mimeType,
+            'description' => $request->description,
+            'user_id' => auth()->id()
         ]);
 
-        return redirect()
-            ->route('boilerplate.file-manager.index')
-            ->with('growl', [__('File uploaded successfully'), 'success']);
+        return redirect()->route('boilerplate.file-manager.index')
+            ->with('growl', [
+                'type' => 'success',
+                'message' => 'File uploaded successfully!',
+                'title' => 'Success'
+            ]);
     }
 
     public function preview(FileManager $fileManager)
     {
-        abort_unless(Storage::disk($fileManager->disk)->exists($fileManager->path), 404);
-
-        $headers = [];
-
-        if ($fileManager->mime_type) {
-            $headers['Content-Type'] = $fileManager->mime_type;
+        if (!$fileManager->isImage()) {
+            abort(404, 'Preview not available for this file type.');
         }
-
-        return response()->file(Storage::disk($fileManager->disk)->path($fileManager->path), $headers);
+        
+        $filePath = storage_path('app/public/' . $fileManager->file_path);
+        
+        if (!file_exists($filePath)) {
+            abort(404, 'File not found.');
+        }
+        
+        return response()->file($filePath, [
+            'Content-Type' => $fileManager->mime_type
+        ]);
     }
 
-    public function download(FileManager $fileManager): StreamedResponse
+    public function download(FileManager $fileManager)
     {
-        abort_unless(Storage::disk($fileManager->disk)->exists($fileManager->path), 404);
-
-        return Storage::disk($fileManager->disk)->download($fileManager->path, $fileManager->original_name);
+        $filePath = storage_path('app/public/' . $fileManager->file_path);
+        
+        if (!file_exists($filePath)) {
+            abort(404, 'File not found.');
+        }
+        
+        return response()->download($filePath, $fileManager->original_name, [
+            'Content-Type' => $fileManager->mime_type
+        ]);
     }
 
-    public function destroy(FileManager $fileManager): RedirectResponse
+    public function destroy(FileManager $fileManager)
     {
-        if (Storage::disk($fileManager->disk)->exists($fileManager->path)) {
-            Storage::disk($fileManager->disk)->delete($fileManager->path);
+        // Delete file from storage
+        if (Storage::disk('public')->exists($fileManager->file_path)) {
+            Storage::disk('public')->delete($fileManager->file_path);
         }
-
+        
+        // Delete database record
         $fileManager->delete();
+        
+        return redirect()->route('boilerplate.file-manager.index')
+            ->with('growl', [
+                'type' => 'success',
+                'message' => 'File deleted successfully!',
+                'title' => 'Success'
+            ]);
+    }
 
-        return back()->with('growl', [__('File deleted successfully'), 'success']);
+    private function getFileCategory($mimeType)
+    {
+        if (str_starts_with($mimeType, 'image/')) return 'image';
+        if (str_starts_with($mimeType, 'video/')) return 'video';
+        if (str_starts_with($mimeType, 'audio/')) return 'audio';
+        if ($mimeType === 'application/pdf') return 'pdf';
+        if (str_contains($mimeType, 'word')) return 'document';
+        if (str_contains($mimeType, 'excel')) return 'spreadsheet';
+        if (str_contains($mimeType, 'presentation')) return 'presentation';
+        if (str_contains($mimeType, 'zip') || str_contains($mimeType, 'rar')) return 'archive';
+        return 'other';
     }
 }
