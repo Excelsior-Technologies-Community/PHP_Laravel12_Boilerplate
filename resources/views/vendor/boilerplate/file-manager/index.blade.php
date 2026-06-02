@@ -1,151 +1,116 @@
 @extends('boilerplate::layout.index', [
-    'title' => 'File Manager',
-    'subtitle' => 'Manage files',
+    'title' => __('File Manager'),
+    'subtitle' => 'Manage your files',
     'breadcrumb' => [
-        'File Manager'
+        __('File Manager')
     ]
 ])
 
 @section('content')
-
 <div class="row">
-    <div class="col-12 mb-3">
-        <a href="{{ route('boilerplate.file-manager.create') }}" class="btn btn-primary">
-            <i class="fa-solid fa-upload mr-1"></i> Upload File
-        </a>
-    </div>
-
     <div class="col-12">
-        @component('boilerplate::card', ['title' => 'Files'])
-            @if($files->count())
-                <div class="file-manager-grid">
-                    @foreach($files as $file)
-                        <div class="file-manager-item">
-                            <a href="{{ route('boilerplate.file-manager.preview', $file) }}" target="_blank" class="file-manager-preview">
-                                @if($file->is_image)
-                                    <img src="{{ route('boilerplate.file-manager.preview', $file) }}" alt="{{ $file->original_name }}">
-                                @elseif($file->is_pdf)
-                                    <iframe src="{{ route('boilerplate.file-manager.preview', $file) }}#toolbar=0" title="{{ $file->original_name }}"></iframe>
-                                @elseif($file->is_text && $file->size <= 1048576)
-                                    <iframe src="{{ route('boilerplate.file-manager.preview', $file) }}" title="{{ $file->original_name }}"></iframe>
-                                @else
-                                    <span class="file-manager-file-icon">
-                                        <i class="fa-regular {{ $file->icon }}"></i>
-                                        <small>{{ $file->extension }}</small>
-                                    </span>
-                                @endif
-                            </a>
-
-                            <div class="file-manager-meta">
-                                <div class="font-weight-bold text-truncate" title="{{ $file->original_name }}">{{ $file->original_name }}</div>
-                                <div class="small text-muted text-truncate">{{ $file->mime_type ?? 'Unknown type' }}</div>
-                                <div class="small text-muted">{{ $file->human_size }} | {{ $file->created_at->format('d M Y, h:i A') }}</div>
-                                <div class="small text-muted text-truncate">By {{ $file->uploader->name ?? 'System' }}</div>
-                            </div>
-
-                            <div class="file-manager-actions">
-                                <a href="{{ route('boilerplate.file-manager.preview', $file) }}" target="_blank" class="btn btn-sm btn-info" title="Preview">
-                                    <i class="fa-solid fa-eye"></i>
-                                </a>
-                                <a href="{{ route('boilerplate.file-manager.download', $file) }}" class="btn btn-sm btn-success" title="Download">
-                                    <i class="fa-solid fa-download"></i>
-                                </a>
-                                <form action="{{ route('boilerplate.file-manager.destroy', $file) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this file?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger" title="Delete">
-                                        <i class="fa-solid fa-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    @endforeach
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">All Files</h3>
+                <div class="card-tools">
+                    <a href="{{ route('boilerplate.file-manager.create') }}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-upload"></i> Upload New File
+                    </a>
                 </div>
-            @else
-                <div class="text-center text-muted py-4">No files uploaded yet.</div>
-            @endif
-
-            <div class="mt-3">
-                {{ $files->links() }}
             </div>
-        @endcomponent
+            <div class="card-body">
+                @if(session('growl'))
+                    <div class="alert alert-{{ session('growl.type') }} alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        <h5><i class="icon fas fa-check"></i> {{ session('growl.title') }}</h5>
+                        {{ session('growl.message') }}
+                    </div>
+                @endif
+                
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>File Name</th>
+                                <th>Type</th>
+                                <th>Size</th>
+                                <th>Uploaded By</th>
+                                <th>Uploaded Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($files as $file)
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>
+                                        <i class="fas fa-{{ $file->file_type }} mr-2"></i>
+                                        {{ Str::limit($file->original_name, 50) }}
+                                        @if($file->description)
+                                            <br><small class="text-muted">{{ Str::limit($file->description, 100) }}</small>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-info">{{ ucfirst($file->file_type) }}</span>
+                                    </td>
+                                    <td>{{ $file->formatted_size }}</td>
+                                    <td>{{ $file->user->name }}</td>
+                                    <td>{{ $file->created_at->format('Y-m-d H:i:s') }}</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            @if($file->isImage())
+                                                <a href="{{ route('boilerplate.file-manager.preview', $file) }}" 
+                                                   target="_blank" 
+                                                   class="btn btn-sm btn-info" 
+                                                   title="Preview">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            @endif
+                                            <a href="{{ route('boilerplate.file-manager.download', $file) }}" 
+                                               class="btn btn-sm btn-success" 
+                                               title="Download">
+                                                <i class="fas fa-download"></i>
+                                            </a>
+                                            <form action="{{ route('boilerplate.file-manager.destroy', $file) }}" 
+                                                  method="POST" 
+                                                  style="display: inline-block;"
+                                                  onsubmit="return confirm('Are you sure you want to delete this file?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-danger" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="7" class="text-center">No files found.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-3">
+                    {{ $files->links() }}
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-
 @endsection
 
 @push('css')
 <style>
-    .file-manager-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: 16px;
+    .table td {
+        vertical-align: middle;
     }
-
-    .file-manager-item {
-        border: 1px solid rgba(0, 0, 0, .12);
-        border-radius: 6px;
-        overflow: hidden;
-        background: #fff;
-    }
-
-    .dark-mode .file-manager-item {
-        background: #343a40;
-        border-color: rgba(255, 255, 255, .12);
-    }
-
-    .file-manager-preview {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 170px;
-        background: #f8f9fa;
-        overflow: hidden;
-    }
-
-    .dark-mode .file-manager-preview {
-        background: #2f3439;
-    }
-
-    .file-manager-preview img,
-    .file-manager-preview iframe {
-        width: 100%;
-        height: 100%;
-        border: 0;
-        object-fit: cover;
-    }
-
-    .file-manager-file-icon {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        color: #6c757d;
-    }
-
-    .file-manager-file-icon i {
-        font-size: 48px;
-    }
-
-    .file-manager-file-icon small {
-        max-width: 120px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        font-weight: 600;
-    }
-
-    .file-manager-meta {
-        padding: 10px 12px 8px;
-        min-height: 96px;
-    }
-
-    .file-manager-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 6px;
-        padding: 0 12px 12px;
+    .badge {
+        font-size: 12px;
+        padding: 5px 10px;
     }
 </style>
 @endpush
